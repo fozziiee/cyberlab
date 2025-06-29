@@ -1,5 +1,9 @@
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 
   subscription_id = "b5d7ea6a-df7a-4f55-93b2-6245517cd5b3"
   
@@ -170,12 +174,19 @@ resource "azurerm_linux_virtual_machine" "kali_vm" {
 
   network_interface_ids = [azurerm_network_interface.kali-nic.id]
 
-  source_image_id = data.azurerm_image.kali_image.id
+
 
   os_disk {
     caching = "ReadWrite"
     storage_account_type = "Standard_LRS"
     name = "KaliOSDisk"
+  }
+
+  source_image_reference {
+    publisher = "kali-linux"
+    offer     = "kali"
+    sku       = "kali-2024-4"
+    version   = "latest"
   }
 
   plan {
@@ -193,10 +204,5 @@ resource "azurerm_linux_virtual_machine" "kali_vm" {
   }
 }
 
-# Reference existing image
-data "azurerm_image" "kali_image" {
-  name                = "kali-image"
-  resource_group_name = azurerm_resource_group.cyberlab-rg.name
-}
 
 
