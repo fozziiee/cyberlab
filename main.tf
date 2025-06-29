@@ -170,7 +170,7 @@ resource "azurerm_linux_virtual_machine" "kali_vm" {
 
   network_interface_ids = [azurerm_network_interface.kali-nic.id]
 
-  source_image_id = azurerm_image.kali_image.id
+  source_image_id = data.azurerm_image.kali_image.id
 
   os_disk {
     caching = "ReadWrite"
