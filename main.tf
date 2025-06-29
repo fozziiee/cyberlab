@@ -15,3 +15,10 @@ resource "azurerm_virtual_network" "cyberlab-vnet" {
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
 }
 
+resource "azurerm_subnet" "cyberlab_subnet" {
+  name = "ServerSubnet"
+  resource_group_name = azurerm_resource_group.cyberlab-rg.name
+  virtual_network_name = azurerm_virtual_network.cyberlab-vnet.name
+  address_prefixes = ["10.0.1.0/24"]
+}
+
