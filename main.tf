@@ -178,6 +178,12 @@ resource "azurerm_linux_virtual_machine" "kali_vm" {
     name = "KaliOSDisk"
   }
 
+  plan {
+    name      = "kali-linux"
+    publisher = "kali-linux"
+    product   = "kali"
+  }
+
   tags = {
     environment = "cyberlab"
     owner       = "kayde"
