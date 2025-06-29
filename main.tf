@@ -179,10 +179,11 @@ resource "azurerm_linux_virtual_machine" "kali_vm" {
   }
 
   plan {
-  publisher = "kali-linux"
-  product   = "kali"
-  name      = "kali-linux"
+    name      = "kali-2024-4"
+    product   = "kali"
+    publisher = "kali-linux"
   }
+
 
 
   tags = {
