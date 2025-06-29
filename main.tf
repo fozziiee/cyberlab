@@ -109,3 +109,51 @@ resource "azurerm_windows_virtual_machine" "cyberlab_vm" {
   }
 }
 
+# Create a public IP for the Kali VM
+resource "azurerm_public_ip" "kali_pip" {
+  name = "Kali-PublicIP"
+  location = azurerm_resource_group.cyberlab-rg.location
+  resource_group_name = azurerm_resource_group.cyberlab-rg.name
+  allocation_method = "Static"
+  sku = "Standard"
+}
+
+# Create NIC for Kali
+resource "azurerm_network_interface" "kali-nic" {
+  name = "Kali-NIC"
+  location = azurerm_resource_group.cyberlab-rg.location
+  resource_group_name = azurerm_resource_group.cyberlab-rg.name
+
+  ip_configuration {
+    name = "internal"
+    subnet_id = azurerm_subnet.cyberlab_subnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id = azurerm_public_ip.kali_pip.id
+  }
+}
+
+# Kali Linux VM
+resource "azurerm_linux_virtual_machine" "kali_vm" {
+  name = "Kali-VM"
+  location = azurerm_resource_group.cyberlab-rg.location
+  resource_group_name = azurerm_resource_group.cyberlab-rg.name
+  size = "Standard_B1ms"
+  admin_username = var.admin_username
+  admin_password = var.admin_password
+  disable_password_authentication = false
+
+  network_interface_ids = [azurerm_network_interface.kali-nic.id]
+
+  os_disk {
+    caching = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "kali-linux"
+    offer = "kali"
+    sku = "kali-linux"
+    version = "latest"
+  }
+}
+
