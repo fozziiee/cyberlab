@@ -90,7 +90,8 @@ resource "azurerm_public_ip" "cyberlab_pip" {
   name = "Cyberlab-PublicIP"
   location = azurerm_resource_group.cyberlab-rg.location
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
-  allocation_method = "Static"
+  allocation_method = "Dynamic"
+  sku = "Basic"
 }
 
 # Create a network interface
@@ -144,8 +145,8 @@ resource "azurerm_public_ip" "kali_pip" {
   name = "Kali-PublicIP"
   location = azurerm_resource_group.cyberlab-rg.location
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
-  allocation_method = "Static"
-  sku = "Standard"
+  allocation_method = "Dynamic"
+  sku = "Basic"
 }
 
 # Create NIC for Kali
@@ -205,4 +206,57 @@ resource "azurerm_linux_virtual_machine" "kali_vm" {
 }
 
 
+# WINDOWS WORKSTATION
 
+# Public IP for workstation
+resource "azurerm_public_ip" "winws_pip" {
+  name = "WinWS-PublicIP"
+  location = azurerm_resource_group.cyberlab-rg.location
+  resource_group_name = azurerm_resource_group.cyberlab-rg.name
+  allocation_method = "Dynamic"
+  sku = "Basic"
+}
+
+# NIC for WinWS
+resource "azurerm_network_interface" "winws_nic" {
+  name = "WinWS-NIC"
+  location = azurerm_resource_group.cyberlab-rg.location
+  resource_group_name = azurerm_resource_group.cyberlab-rg.name
+
+  ip_configuration {
+    name = "Internal"
+    subnet_id = azurerm_subnet.cyberlab_subnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id = azurerm_public_ip.winws_pip.id
+  }
+}
+
+resource "azurerm_windows_virtual_machine" "winws_vm" {
+  name = "WinWorkstation"
+  location = azurerm_resource_group.cyberlab-rg.location
+  resource_group_name = azurerm_resource_group.cyberlab-rg.name
+  size = "StandardB2s"
+  admin_username = var.admin_username
+  admin_password = var.admin_password
+  
+  network_interface_ids = [azurerm_network_interface.winws_nic.id]
+
+  os_disk {
+    name = "WinWSOSDisk"
+    caching = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsDesktop"
+    offer = "windows-11"
+    sku = "win11-22h2-pro"
+    version = "latest"
+  }
+
+  tags = { 
+    environment = "cyberlab"
+    owner = "kayde"
+    role = "windows-workstation"
+   }
+} 
