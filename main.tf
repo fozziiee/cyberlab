@@ -163,23 +163,19 @@ resource "azurerm_linux_virtual_machine" "kali_vm" {
   name = "Kali-VM"
   location = azurerm_resource_group.cyberlab-rg.location
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
-  size = "Standard_B1ms"
+  size = "Standard_B1s"
   admin_username = var.admin_username
   admin_password = var.admin_password
   disable_password_authentication = false
 
   network_interface_ids = [azurerm_network_interface.kali-nic.id]
 
+  source_image_id = azurerm_image.kali_image.id
+
   os_disk {
     caching = "ReadWrite"
     storage_account_type = "Standard_LRS"
-  }
-
-  source_image_reference {
-    publisher = "kali-linux"
-    offer = "kali"
-    sku = "kali-linux"
-    version = "latest"
+    name = "KaliOSDisk"
   }
 
   tags = {
@@ -188,4 +184,11 @@ resource "azurerm_linux_virtual_machine" "kali_vm" {
     role        = "kali-vm"
   }
 }
+
+# Reference existing image
+data "azurerm_image" "kali_image" {
+  name                = "kali-image"
+  resource_group_name = azurerm_resource_group.cyberlab-rg.name
+}
+
 
