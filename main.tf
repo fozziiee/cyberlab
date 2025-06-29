@@ -8,6 +8,12 @@ provider "azurerm" {
 resource "azurerm_resource_group" "cyberlab-rg" {
   name = "cyberlab-rg"
   location = "Australia East"
+
+  tags = {
+    environment = "cyberlab"
+    owner       = "kayde"
+    purpose     = "lab"
+  }
 }
 
 resource "azurerm_virtual_network" "cyberlab-vnet" {
@@ -15,6 +21,12 @@ resource "azurerm_virtual_network" "cyberlab-vnet" {
   address_space = [ "10.0.0.0/16" ]
   location = azurerm_resource_group.cyberlab-rg.location
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
+
+  tags = {
+    environment = "cyberlab"
+    owner       = "kayde"
+    purpose     = "lab"
+  }
 }
 
 resource "azurerm_subnet" "cyberlab_subnet" {
@@ -22,6 +34,8 @@ resource "azurerm_subnet" "cyberlab_subnet" {
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
   virtual_network_name = azurerm_virtual_network.cyberlab-vnet.name
   address_prefixes = ["10.0.1.0/24"]
+
+  
 }
 
 # Create Network Security Group (NSG) 
@@ -52,6 +66,12 @@ resource "azurerm_network_security_group" "cyberlab_nsg" {
     destination_port_range     = "22"
     source_address_prefix      = "Internet"
     destination_address_prefix = "*"
+  }
+
+  tags = {
+    environment = "cyberlab"
+    owner       = "kayde"
+    purpose     = "lab"
   }
 }
 
@@ -107,6 +127,12 @@ resource "azurerm_windows_virtual_machine" "cyberlab_vm" {
     sku = "2019-Datacenter"
     version = "latest"
   }
+
+  tags = {
+    environment = "cyberlab"
+    owner       = "kayde"
+    role        = "windows-server"
+  }
 }
 
 # Create a public IP for the Kali VM
@@ -154,6 +180,12 @@ resource "azurerm_linux_virtual_machine" "kali_vm" {
     offer = "kali"
     sku = "kali-linux"
     version = "latest"
+  }
+
+  tags = {
+    environment = "cyberlab"
+    owner       = "kayde"
+    role        = "kali-vm"
   }
 }
 
