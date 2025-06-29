@@ -66,7 +66,7 @@ resource "azurerm_public_ip" "cyberlab_pip" {
   name = "Cyberlab-PublicIP"
   location = azurerm_resource_group.cyberlab-rg.location
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
-  allocation_method = "Dynamic"
+  allocation_method = "Static"
 }
 
 # Create a network interface
