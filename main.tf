@@ -235,7 +235,7 @@ resource "azurerm_windows_virtual_machine" "winws_vm" {
   name = "WinWorkstation"
   location = azurerm_resource_group.cyberlab-rg.location
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
-  size = "StandardB2ms"
+  size = "Standard_B2as_v2"
   admin_username = var.admin_username
   admin_password = var.admin_password
   
