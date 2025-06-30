@@ -232,25 +232,25 @@ resource "azurerm_network_interface" "winws_nic" {
 }
 
 resource "azurerm_windows_virtual_machine" "winws_vm" {
-  name = "WinWorkstation"
-  location = azurerm_resource_group.cyberlab-rg.location
+  name                = "WinWorkstation"
+  location            = azurerm_resource_group.cyberlab-rg.location
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
-  size = "Standard_B2as_v2"
-  admin_username = var.admin_username
-  admin_password = var.admin_password
+  size                = "Standard_B1s"
+  admin_username      = var.admin_username
+  admin_password      = var.admin_password
   
   network_interface_ids = [azurerm_network_interface.winws_nic.id]
 
   os_disk {
-    name = "WinWSOSDisk"
-    caching = "ReadWrite"
+    name                 = "WinWSOSDisk"
+    caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
 
   source_image_reference {
     publisher = "MicrosoftWindowsDesktop"
     offer = "windows-11"
-    sku = "win11-22h2-pro"
+    sku = "win11-24h2-pro"
     version = "latest"
   }
 
