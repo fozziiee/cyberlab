@@ -163,13 +163,13 @@ resource "azurerm_virtual_machine_extension" "enable_winrm" {
   type = "CustomScriptExtension"
   type_handler_version = "1.10"
 
-  settings = jsondecode({
+  settings = {
     commandToExecute = "powershell -ExecutionPolicy Unrestricted -File enable-winrm.ps1"
-  })
+  }
 
-  protected_settings = jsondecode({
+  protected_settings = {
     script = file("enable-winrm.ps1")
-  })
+  }
 }
 
 # Create a public IP for the Kali VM
