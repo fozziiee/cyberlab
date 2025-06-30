@@ -2,3 +2,5 @@ terraform.tfvars
 *.tfstate
 *.tfstate.backup
 .terraform/
+.pre-commit-config.yaml
+.terraform.lock.hcl
