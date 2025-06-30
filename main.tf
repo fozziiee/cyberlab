@@ -72,6 +72,19 @@ resource "azurerm_network_security_group" "cyberlab_nsg" {
     destination_address_prefix = "*"
   }
 
+    security_rule {
+    name                       = "Allow-WinRM-HTTPS"
+    priority                   = 120
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "5986"
+    source_address_prefix      = "Internet"
+    destination_address_prefix = "*"
+  }
+
+
   tags = {
     environment = "cyberlab"
     owner       = "kayde"
@@ -86,31 +99,31 @@ resource "azurerm_subnet_network_security_group_association" "cyberlab_assoc" {
 }
 
 # Create a public IP address
-resource "azurerm_public_ip" "cyberlab_pip" {
-  name = "Cyberlab-PublicIP"
+resource "azurerm_public_ip" "cyberlabserver_pip" {
+  name = "CyberlabServer-PublicIP"
   location = azurerm_resource_group.cyberlab-rg.location
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
-  allocation_method = "Dynamic"
+  allocation_method = "Static"
   sku = "Basic"
 }
 
 # Create a network interface
 resource "azurerm_network_interface" "cyberlab-nic" {
-  name = "Cyberlab-NIC"
+  name = "CyberlabServer-NIC"
   location = azurerm_resource_group.cyberlab-rg.location
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
 
   ip_configuration {
     name = "internal"
     subnet_id = azurerm_subnet.cyberlab_subnet.id
-    private_ip_address_allocation = "Dynamic"
+    private_ip_address_allocation = "Static"
     public_ip_address_id = azurerm_public_ip.cyberlab_pip.id
   }
 }
 
 # Deploy the Windows Server VM
-resource "azurerm_windows_virtual_machine" "cyberlab_vm" {
-  name = "Cyberlab-VM"
+resource "azurerm_windows_virtual_machine" "cyberlab_server_vm" {
+  name = "CyberlabServer-VM"
   location = azurerm_resource_group.cyberlab-rg.location
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
   size = "Standard_B1ms"
@@ -134,10 +147,29 @@ resource "azurerm_windows_virtual_machine" "cyberlab_vm" {
   }
 
   tags = {
-    environment = "cyberlab"
+    environment = "cyberlabServer"
     owner       = "kayde"
     role        = "windows-server"
   }
+}
+
+##### EXTENSIONS ######
+
+# WinRM Extension
+resource "azurerm_virtual_machine_extension" "enable_winrm" {
+  name = "EnableWinRM"
+  virtual_machine_id = azurerm_windows_virtual_machine.cyberlab_server_vm.id
+  publisher = "Microsoft.Compute"
+  type = "CustomScriptExtension"
+  type_handler_version = "1.10"
+
+  settings = jsondecode({
+    commandToExecute = "powershell -ExecutionPolicy Unrestricted -File enable-winrm.ps1"
+  })
+
+  protected_settings = jsondecode({
+    script = file("enable-winrm.ps1")
+  })
 }
 
 # Create a public IP for the Kali VM

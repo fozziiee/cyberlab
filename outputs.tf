@@ -11,8 +11,8 @@ output "subnet_nsg_assoc_id" {
   value = azurerm_subnet_network_security_group_association.cyberlab_assoc.id
 }
 
-output "windows_vm_ip" {
-  value = azurerm_public_ip.cyberlab_pip.ip_address
+output "windows_server_ip" {
+  value = azurerm_public_ip.cyberlabserver_pip.ip_address
   description = "Public IP of the Windows VM"
 }
 
