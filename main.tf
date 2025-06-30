@@ -124,7 +124,7 @@ resource "azurerm_network_interface" "cyberlab-nic" {
 
 # Deploy the Windows Server VM
 resource "azurerm_windows_virtual_machine" "cyberlab_server_vm" {
-  name = "CyberlabServer-VM"
+  name = "Server-VM"
   location = azurerm_resource_group.cyberlab-rg.location
   resource_group_name = azurerm_resource_group.cyberlab-rg.name
   size = "Standard_B1ms"
