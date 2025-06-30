@@ -117,6 +117,7 @@ resource "azurerm_network_interface" "cyberlab-nic" {
     name = "internal"
     subnet_id = azurerm_subnet.cyberlab_subnet.id
     private_ip_address_allocation = "Static"
+    private_ip_address = "10.0.1.1"
     public_ip_address_id = azurerm_public_ip.cyberlabserver_pip.id
   }
 }
