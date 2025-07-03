@@ -36,14 +36,6 @@ module "windows_server" {
   admin_password      = var.admin_password
 }
 
-module "kali_vm" {
-  source              = "./modules/kali_vm"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  subnet_id           = module.network.subnet_id
-  admin_username      = var.admin_username
-  admin_password      = var.admin_password
-}
 
 module "win_workstation" {
   source              = "./modules/win_workstation"

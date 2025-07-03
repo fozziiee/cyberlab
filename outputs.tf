@@ -10,13 +10,6 @@ output "win_workstation_private_ip" {
   value = module.win_workstation.win_workstation_private_ip
 }
 
-
-# Kali VM
-output "kali_vm_private_ip" {
-  value = module.kali_vm.kali_vm_private_ip
-}
-
-
 # Jumpbox
 output "win_jumpbox_private_ip" {
   value = module.jumpbox.win_jumpbox_private_ip
