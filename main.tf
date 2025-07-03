@@ -62,3 +62,12 @@ module "jumpbox" {
   admin_username      = var.admin_username
   admin_password      = var.admin_password
 }
+
+module "vpn_server" {
+  source              = "./modules/vpn_server"
+  location            = local.location
+  resource_group_name = local.resource_group_name
+  subnet_id           = module.network.subnet_id
+  ssh_public_key_path = "~/.shh/id_rsa.pub"
+  admin_username      = var.admin_username
+}

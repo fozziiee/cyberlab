@@ -25,3 +25,7 @@ output "win_jumpbox_private_ip" {
 output "win_jumpbox_public_ip" {
   value = module.jumpbox.win_jumpbox_public_ip
 }
+
+output "vpn_server_public_ip" {
+  value = module.vpn_server.public_ip
+}
