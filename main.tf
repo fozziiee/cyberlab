@@ -68,6 +68,6 @@ module "vpn_server" {
   location            = local.location
   resource_group_name = local.resource_group_name
   subnet_id           = module.network.subnet_id
-  ssh_public_key_path = "home/kayde/id_rsa.pub"
+  ssh_public_key_path = "/home/kayde/id_rsa.pub"
   admin_username      = var.admin_username
 }
