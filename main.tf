@@ -21,35 +21,44 @@ resource "azurerm_resource_group" "cyberlab-rg" {
 }
 
 module "network" {
-  source                 = "./modules/network"
-  resource_group_name    = local.resource_group_name
-  location               = local.location
+  source              = "./modules/network"
+  resource_group_name = local.resource_group_name
+  location            = local.location
 }
 
 
 module "windows_server" {
-  source                = "./modules/windows_server"
-  resource_group_name   = local.resource_group_name
-  location              = local.location
-  subnet_id             = module.network.subnet_id
-  admin_username        = var.admin_username
-  admin_password        = var.admin_password
+  source              = "./modules/windows_server"
+  resource_group_name = local.resource_group_name
+  location            = local.location
+  subnet_id           = module.network.subnet_id
+  admin_username      = var.admin_username
+  admin_password      = var.admin_password
 }
 
 module "kali_vm" {
-  source                = "./modules/kali_vm"
-  resource_group_name   = local.resource_group_name
-  location              = local.location
-  subnet_id             = module.network.subnet_id
-  admin_username        = var.admin_username
-  admin_password         = var.admin_password
+  source              = "./modules/kali_vm"
+  resource_group_name = local.resource_group_name
+  location            = local.location
+  subnet_id           = module.network.subnet_id
+  admin_username      = var.admin_username
+  admin_password      = var.admin_password
 }
 
 module "win_workstation" {
-  source                = "./modules/win_workstation"
-  resource_group_name   = local.resource_group_name
-  location              = local.location
-  subnet_id             = module.network.subnet_id
-  admin_username        = var.admin_username
-  admin_password         = var.admin_password
+  source              = "./modules/win_workstation"
+  resource_group_name = local.resource_group_name
+  location            = local.location
+  subnet_id           = module.network.subnet_id
+  admin_username      = var.admin_username
+  admin_password      = var.admin_password
+}
+
+module "jumpbox" {
+  source              = "./modules/jumpbox"
+  resource_group_name = local.resource_group_name
+  location            = local.location
+  subnet_id           = module.network.subnet_id
+  admin_username      = var.admin_username
+  admin_password      = var.admin_password
 }

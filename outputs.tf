@@ -1,28 +1,36 @@
-output "vnet_name" {
-  description = "The name of the virtual network"
-  value       = azurerm_virtual_network.cyberlab-vnet.name
+
+# Server outputs
+output "server_private_ip" {
+  value = module.windows_server.server_private_ip
 }
 
-output "nsg_name" {
-  value = azurerm_network_security_group.cyberlab_nsg.name
+output "server_public_ip" {
+  value = module.windows_server.server_public_ip
 }
 
-output "subnet_nsg_assoc_id" {
-  value = azurerm_subnet_network_security_group_association.cyberlab_assoc.id
+# Workstation outputs
+output "win_workstation_private_ip" {
+  value = module.win_workstation.win_workstation_private_ip
 }
 
-output "windows_server_ip" {
-  value       = azurerm_public_ip.cyberlabserver_pip.ip_address
-  description = "Public IP of the Windows VM"
+output "win_workstation_public_ip" {
+  value = module.win_workstation.win_workstation_public_ip
 }
 
-output "kali_vm_ip" {
-  value       = azurerm_public_ip.kali_pip.ip_address
-  description = "Public IP of the Kali Linux VM"
+# Kali VM
+output "kali_vm_private_ip" {
+  value = module.kali_vm.kali_vm_private_ip
 }
 
-output "win_ws_ip" {
-  value       = azurerm_public_ip.winws_pip.ip_address
-  description = "Public IP of the Windows Workstation"
+output "kali_vm_public_ip" {
+  value = module.kali_vm.kali_vm_public_ip
 }
 
+# Jumpbox
+output "win_jumpbox_private_ip" {
+  value = module.jumpbox.win_jumpbox_private_ip
+}
+
+output "win_jumpbox_public_ip" {
+  value = module.jumpbox.win_jumpbox_public_ip
+}

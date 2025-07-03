@@ -72,6 +72,6 @@ resource "azurerm_virtual_machine_extension" "enable_winrm" {
   })
 
   protected_settings = jsonencode({
-    script = base64encode(file("${path.module}/../enable-winrm.ps1"))
+    script = base64encode(file("${path.root}/enable-winrm.ps1"))
   })
 }
