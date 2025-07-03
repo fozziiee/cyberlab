@@ -1,13 +1,5 @@
 # WINDOWS WORKSTATION
 
-# Public IP for workstation
-resource "azurerm_public_ip" "this" {
-  name                = "WinWS-PublicIP"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  allocation_method   = "Dynamic"
-  sku                 = "Basic"
-}
 
 # NIC for WinWS
 resource "azurerm_network_interface" "this" {

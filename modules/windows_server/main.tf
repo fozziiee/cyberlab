@@ -1,13 +1,5 @@
 # modules/windows_server/main.tf
 
-# Create a public IP address
-resource "azurerm_public_ip" "this" {
-  name                = "CyberlabServer-PublicIP"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  allocation_method   = "Static"
-  sku                 = "Basic"
-}
 
 # Create a network interface
 resource "azurerm_network_interface" "this" {

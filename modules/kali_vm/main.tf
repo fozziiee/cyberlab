@@ -1,13 +1,5 @@
 # modules/kali_vm/main.tf
 
-# Create a public IP for the Kali VM (will comment out when not needed)
-resource "azurerm_public_ip" "this" {
-  name                = "Kali-PublicIP"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  allocation_method   = "Dynamic"
-  sku                 = "Basic"
-}
 
 # Create NIC for Kali
 resource "azurerm_network_interface" "this" {
