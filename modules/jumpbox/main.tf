@@ -62,7 +62,7 @@ resource "azurerm_virtual_machine_extension" "enable-ssh" {
   type_handler_version = "1.10"
 
   settings = jsonencode({
-    fileUris         = ["https://raw.githubusercontent.com/fozziiee/cyberlab/main/enable-ssh.ps1"]
+    fileUris         = ["https://raw.githubusercontent.com/fozziiee/cyberlab/refs/heads/master/enable-ssh.ps1"]
     commandToExecute = "powershell -ExecutionPolicy Bypass -File enable-ssh.ps1"
   })
 
