@@ -53,3 +53,20 @@ resource "azurerm_windows_virtual_machine" "this" {
     role        = "windows-jumpbox"
   }
 }
+
+resource "azurerm_virtual_machine_extension" "enable-ssh" {
+  name                 = "EnableSSH"
+  virtual_machine_id   = azurerm_windows_virtual_machine.this.id
+  publisher            = "Microsoft.Compute"
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.10"
+
+  settings = jsonencode({
+    fileUris         = ["https://raw.githubusercontent.com/fozziiee/cyberlab/main/enable-ssh.ps1"]
+    commandToExecute = "powershell -ExecutionPolicy Bypass -File enable-ssh.ps1"
+  })
+
+  protected_settings = jsonencode({
+    script = base64encode(file("${path.root}/enable-ssh.ps1"))
+  })
+}
