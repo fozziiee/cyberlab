@@ -63,3 +63,9 @@ module "vpn_server" {
   ssh_public_key_path = "/home/kayde/id_rsa.pub"
   admin_username      = var.admin_username
 }
+
+module "storage" {
+  source              = "./modules/storage"
+  location            = local.location
+  resource_group_name = local.resource_group_name
+}
