@@ -10,5 +10,8 @@ runcmd:
     - mv /etc/openvpn/server_* /etc/openvpn/server/
     - mv /etc/openvpn/server.conf /etc/openvpn/server/
     - mv /etc/openvpn/tls-crypt.key /etc/openvpn/server/
-    - systemctl stop openvpn
+    - systemctl stop openvpn || true
+    - systemctl disable openvpn || true
+    - fuser -k 1194/udp || true
+    - systemctl enable openvpn-server@server
     - systemctl restart openvpn-server@server

@@ -28,17 +28,6 @@ resource "azurerm_network_security_group" "this" {
   location            = var.location
   resource_group_name = var.resource_group_name
 
-  security_rule {
-    name                       = "Allow-RDP"
-    priority                   = 130
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "3389"
-    source_address_prefix      = "Internet"
-    destination_address_prefix = "*"
-  }
 
   security_rule {
     name                       = "Allow-SSH"
@@ -48,18 +37,6 @@ resource "azurerm_network_security_group" "this" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "Internet"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "Allow-WinRM-HTTPS"
-    priority                   = 120
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "5986"
     source_address_prefix      = "Internet"
     destination_address_prefix = "*"
   }
