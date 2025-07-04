@@ -19,3 +19,7 @@ variable "ssh_public_key_path" {
   type = string
 }
 
+variable "ovpn_upload_url" {
+  type = string
+}
+

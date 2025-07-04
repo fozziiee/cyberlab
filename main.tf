@@ -62,6 +62,8 @@ module "vpn_server" {
   subnet_id           = module.network.subnet_id
   ssh_public_key_path = "/home/kayde/id_rsa.pub"
   admin_username      = var.admin_username
+
+  ovpn_upload_url = "${module.storage.upload_url_base}/kayde.ovpn${module.storage.sas_token}"
 }
 
 module "storage" {

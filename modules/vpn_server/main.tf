@@ -81,7 +81,9 @@ resource "azurerm_linux_virtual_machine" "this" {
     version   = "latest"
   }
 
-  custom_data = filebase64("${path.root}/openvpn-install.txt")
+  custom_data = base64encode(templatefile("${path.root}/openvpn-install.tpl", {
+    ovpn_upload_url = var.ovpn_upload_url
+  }))
 
   tags = {
     environment = "cyberlab"
