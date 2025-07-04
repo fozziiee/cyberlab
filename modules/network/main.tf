@@ -64,6 +64,18 @@ resource "azurerm_network_security_group" "this" {
     destination_address_prefix = "*"
   }
 
+  security_rule {
+    name                       = "Allow-OpenVPN"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Udp"
+    source_port_range          = "*"
+    destination_port_range     = "1194"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
 
   tags = {
     environment = "cyberlab"
