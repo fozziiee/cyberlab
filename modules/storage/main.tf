@@ -23,7 +23,7 @@ resource "azurerm_storage_container" "vpn" {
 
 resource "time_static" "now" {}
 
-data "azurerm_storage_account_sas" "vpn-sas" {
+data "azurerm_storage_account_sas" "vpn_sas" {
   connection_string = azurerm_storage_account.this.primary_connection_string
 
   https_only = true
