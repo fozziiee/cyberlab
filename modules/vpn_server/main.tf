@@ -16,7 +16,8 @@ resource "azurerm_network_interface" "this" {
   ip_configuration {
     name                          = "internal"
     subnet_id                     = var.subnet_id
-    private_ip_address_allocation = "Dynamic"
+    private_ip_address_allocation = "Static"
+    private_ip_address            = "10.0.1.101"
     public_ip_address_id          = azurerm_public_ip.this.id
   }
 }
