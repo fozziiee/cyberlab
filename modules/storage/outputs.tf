@@ -5,14 +5,17 @@ output "storage_account_name" {
 }
 
 output "sas_token" {
-  value = data.azurerm_storage_account_sas.vpn-sas.sas
+  value     = data.azurerm_storage_account_sas.vpn-sas.sas
+  sensitive = true
 }
 
 output "container_name" {
-  value = azurerm_storage_container.vpn.name
+  value     = azurerm_storage_container.vpn.name
+  sensitive = true
 }
 
 output "upload_url_base" {
-  value = "https://${azurerm_storage_account.this.name}.blob.core.windows.net/${azurerm_storage_container.vpn.name}"
+  value     = "https://${azurerm_storage_account.this.name}.blob.core.windows.net/${azurerm_storage_container.vpn.name}"
+  sensitive = true
 }
 
