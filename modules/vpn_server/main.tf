@@ -82,7 +82,8 @@ resource "azurerm_linux_virtual_machine" "this" {
   }
 
   custom_data = base64encode(templatefile("${path.root}/openvpn-install.tpl", {
-    ovpn_upload_url = var.ovpn_upload_url
+    ovpn_upload_url = var.ovpn_upload_url,
+    admin_user      = var.admin_username
   }))
 
   tags = {
