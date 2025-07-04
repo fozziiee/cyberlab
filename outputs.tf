@@ -24,5 +24,17 @@ output "vpn_server_public_ip" {
 }
 
 output "upload_url_base" {
-  value = "https://${azurerm_storage_account.this.name}.blob.core.windows.net/${azurerm_storage_container.vpn.name}"
+  value = module.storage.upload_url_base
+}
+
+output "storage_account_name" {
+  value = module.storage.storage_account_name
+}
+
+output "sas_token" {
+  value = module.storage.sas_token
+}
+
+output "container_name" {
+  value = module.storage.sas_token
 }
