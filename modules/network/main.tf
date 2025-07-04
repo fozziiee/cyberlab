@@ -30,7 +30,7 @@ resource "azurerm_network_security_group" "this" {
 
   security_rule {
     name                       = "Allow-RDP"
-    priority                   = 100
+    priority                   = 130
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
