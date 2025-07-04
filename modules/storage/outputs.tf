@@ -5,7 +5,7 @@ output "storage_account_name" {
 }
 
 output "sas_token" {
-  value     = "?${data.azurerm_storage_account_sas.vpn_sas.sas}"
+  value     = data.azurerm_storage_account_sas.vpn_sas.sas
   sensitive = true
 }
 
