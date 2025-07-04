@@ -41,3 +41,8 @@ output "container_name" {
   value     = module.storage.sas_token
   sensitive = true
 }
+
+output "vpn_config_download_url" {
+  value     = "${module.storage.upload_url_base}/kayde.ovpn${module.storage.sas_token}"
+  sensitive = true
+}
