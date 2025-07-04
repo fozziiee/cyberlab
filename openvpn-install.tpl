@@ -10,4 +10,5 @@ runcmd:
     - mv /etc/openvpn/server_* /etc/openvpn/server/
     - mv /etc/openvpn/server.conf /etc/openvpn/server/
     - mv /etc/openvpn/tls-crypt.key /etc/openvpn/server/
+    - systemctl stop openvpn
     - systemctl restart openvpn-server@server
