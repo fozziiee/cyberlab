@@ -24,7 +24,8 @@ output "vpn_server_public_ip" {
 }
 
 output "upload_url_base" {
-  value = module.storage.upload_url_base
+  value     = module.storage.upload_url_base
+  sensitive = true
 }
 
 output "storage_account_name" {
@@ -32,9 +33,11 @@ output "storage_account_name" {
 }
 
 output "sas_token" {
-  value = module.storage.sas_token
+  value     = module.storage.sas_token
+  sensitive = true
 }
 
 output "container_name" {
-  value = module.storage.sas_token
+  value     = module.storage.sas_token
+  sensitive = true
 }
