@@ -22,3 +22,7 @@ output "win_jumpbox_public_ip" {
 output "vpn_server_public_ip" {
   value = module.vpn_server.public_ip
 }
+
+output "upload_url_base" {
+  value = "https://${azurerm_storage_account.this.name}.blob.core.windows.net/${azurerm_storage_container.vpn.name}"
+}
