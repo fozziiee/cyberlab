@@ -70,7 +70,7 @@ resource "azurerm_virtual_machine_extension" "enable_winrm" {
 resource "azurerm_virtual_machine_extension" "ad_domain_setup" {
   name                 = "ADDomainSetup"
   virtual_machine_id   = azurerm_windows_virtual_machine.this.id
-  publisher            = "Microsoft.Comput"
+  publisher            = "Microsoft.Compute"
   type                 = "CustomScriptExtension"
   type_handler_version = "1.10"
 
