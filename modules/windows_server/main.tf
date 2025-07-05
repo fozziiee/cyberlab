@@ -75,7 +75,7 @@ resource "azurerm_virtual_machine_extension" "ad_domain_setup" {
   type_handler_version = "1.10"
 
   settings = jsonencode({
-    fileUris         = ["https://raw.githubusercontent.com/fozziiee/cyberlab/refs/heads/master/new-ad-setup.ps1"]
+    fileUris         = ["https://raw.githubusercontent.com/fozziiee/cyberlab/master/new-ad-setup.ps1"]
     commandToExecute = "powershell -ExecutionPolicy Unrestricted -File C:\\new-ad-setup.ps1"
   })
 
