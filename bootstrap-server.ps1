@@ -18,8 +18,8 @@ if (-not (Test-Path "C:\cyberlab")) {
 # Ensure Git is installed
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     Invoke-WebRequest -Uri "https://github.com/git-for-windows/git/releases/download/v2.42.0.windows.1/Git-2.42.0-64-bit.exe" `
-        -OutFile "C:\temp\git-installer.exe"
-    Start-Process "C:\temp\git-installer.exe" -ArgumentList "/VERYSILENT", "/NORESTART" -Wait
+        -OutFile "C:Windows\Temp\git-installer.exe"
+    Start-Process "C:Windows\Temp\git-installer.exe" -ArgumentList "/VERYSILENT", "/NORESTART" -Wait
 }
 
 # Clone AD repo
