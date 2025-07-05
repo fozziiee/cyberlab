@@ -67,17 +67,17 @@ resource "azurerm_windows_virtual_machine" "this" {
 #   })
 # }
 
-resource "azurerm_virtual_machine_extension" "ad_domain_setup" {
-  name                 = "ADDomainSetup"
-  virtual_machine_id   = azurerm_windows_virtual_machine.this.id
-  publisher            = "Microsoft.Compute"
-  type                 = "CustomScriptExtension"
-  type_handler_version = "1.10"
+# resource "azurerm_virtual_machine_extension" "ad_domain_setup" {
+#   name                 = "ADDomainSetup"
+#   virtual_machine_id   = azurerm_windows_virtual_machine.this.id
+#   publisher            = "Microsoft.Compute"
+#   type                 = "CustomScriptExtension"
+#   type_handler_version = "1.10"
 
-  settings = jsonencode({
-    fileUris         = ["https://raw.githubusercontent.com/fozziiee/cyberlab/master/bootstrap-server.ps1"]
-    commandToExecute = "powershell -ExecutionPolicy Unrestricted -File bootstrap-server.ps1"
-  })
+#   settings = jsonencode({
+#     fileUris         = ["https://raw.githubusercontent.com/fozziiee/cyberlab/master/bootstrap-server.ps1"]
+#     commandToExecute = "powershell -ExecutionPolicy Unrestricted -File bootstrap-server.ps1"
+#   })
 
-}
+# }
 

@@ -15,6 +15,23 @@ if (-not (Test-Path "C:\cyberlab")) {
     New-Item -Path "C:\cyberlab" -ItemType Directory -Force | Out-Null
 }
 
+Set-ExecutionPolicy Bypass -Scope Process -Force
+Invoke-WebRequest "https://chocolatey.org/install.ps1" -UseBasicParsing | iex
+
+# Mark reboot
+New-Item -ItemType File -Path "C:\cyberlab\pending-reboot.flag"
+
+Restart-Computer -Force
+
+if (Test-Path "C:\cyberlab\pending-reboot.flag") {
+    choco install git -y
+
+    Remove-Item "C:\cyberlab\pending-reboot.flag"
+
+}
+
+
+
 # Ensure Git is installed
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     Invoke-WebRequest -Uri "https://github.com/git-for-windows/git/releases/download/v2.42.0.windows.1/Git-2.42.0-64-bit.exe" `
@@ -23,8 +40,8 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 }
 
 # Clone AD repo
-if (-not (Test-Path "C:\cyberlab\AD")) {
-    git clone "https://github.com/fozziiee/AD.git" "C:\cyberlab\AD"
+if (-not (Test-Path "C:\cyberlab")) {
+    git clone "https://github.com/fozziiee/AD.git" "C:\cyberlab"
 }
 
 
