@@ -1,13 +1,14 @@
 
 
-$domain = "xyz.local"
-$safeModePassword = ConvertTo-SecureString "P@ssw0rd123" -AsPlainText -Force
-$bootstrapScriptPath = "C:\cyberlab\AD\code\bootstrap_ad.ps1"
-
 # Enable WinRM
 Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value true
 Set-Item -Path "WSMan:\localhost\Service\Auth\Basic" -Value true
 Enable-PSRemoting -Force
+
+# Ensure Temp Direcytory exists
+if (-not (Test-Path "C:\Temp")) {
+    New-Item -Path "C:\Temp" -ItemType Directory -Force | Out-Null
+}
 
 
 # Ensure the script directory exists
@@ -16,21 +17,27 @@ if (-not (Test-Path "C:\cyberlab")) {
 }
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
-Invoke-WebRequest "https://chocolatey.org/install.ps1" -UseBasicParsing | iex
+
+# Install .NET 4.8
+Invoke-WebRequest `
+  -Uri "https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/8494001c276a4b96804cde7829c04d7f/ndp48-x86-x64-allos-enu.exe" `
+  -OutFile "C:\Temp\ndp48.exe"
+Start-Process "C:\Temp\ndp48.exe" -ArgumentList "/quiet /norestart" -Wait
 
 # Mark reboot
-New-Item -ItemType File -Path "C:\cyberlab\pending-reboot.flag"
+New-Item -ItemType File -Path "C:\Temp\pending-reboot.flag"
 
 Restart-Computer -Force
 
-if (Test-Path "C:\cyberlab\pending-reboot.flag") {
+Invoke-WebRequest "https://chocolatey.org/install.ps1" -UseBasicParsing | iex
+
+
+if (Test-Path "C:\Temp\pending-reboot.flag") {
     choco install git -y
 
-    Remove-Item "C:\cyberlab\pending-reboot.flag"
+    Remove-Item "C:\Temp\pending-reboot.flag"
 
 }
-
-
 
 # Ensure Git is installed
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
@@ -43,6 +50,10 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 if (-not (Test-Path "C:\cyberlab")) {
     git clone "https://github.com/fozziiee/AD.git" "C:\cyberlab"
 }
+
+$domain = "xyz.local"
+$safeModePassword = ConvertTo-SecureString "P@ssw0rd123" -AsPlainText -Force
+$bootstrapScriptPath = "C:\cyberlab\AD\code\bootstrap_ad.ps1"
 
 
 # Schedule it to run on startup with args
