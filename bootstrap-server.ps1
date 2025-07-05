@@ -4,6 +4,12 @@ $domain = "xyz.local"
 $safeModePassword = Convert-To-SecureString "P@ssw0rd123" -AsPlainText -Force
 $bootstrapScriptPath = "C:\cyberlab\AD\code\bootstrap_ad.ps1"
 
+# Enable WinRM
+Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value true
+Set-Item -Path "WSMan:\localhost\Service\Auth\Basic" -Value true
+Enable-PSRemoting -Force
+
+
 # Ensure the script directory exists
 if (-not (Test-Path "C:\cyberlab")) {
     New-Item -Path "C:\cyberlab" -ItemType Directory -Force | Out-Null
