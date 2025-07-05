@@ -1,7 +1,7 @@
 
 
 $domain = "xyz.local"
-$safeModePassword = Convert-To-SecureString "P@ssw0rd123" -AsPlainText -Force
+$safeModePassword = ConvertTo-SecureString "P@ssw0rd123" -AsPlainText -Force
 $bootstrapScriptPath = "C:\cyberlab\AD\code\bootstrap_ad.ps1"
 
 # Enable WinRM
