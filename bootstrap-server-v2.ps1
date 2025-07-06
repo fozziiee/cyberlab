@@ -60,9 +60,9 @@ if (-not (StepCompleted $gitFlag)) {
 
 
 # ==== Clone AD repo =============
-
+$repoPath = "$cyberlabPath\AD"
 $gitPath = "C:\Program Files\Git\cmd\git.exe"
-if (-not (Test-Path $gitFlag)) {
+if (-not (Test-Path $repoPath)) {
     try {
         & $gitPath clone "https://github.com/fozziiee/AD.git" $cyberlabPath
     }
