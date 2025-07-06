@@ -74,9 +74,9 @@ if (-not (Test-Path $repoPath)) {
 
 # ============ Schedule AD Bootstrap Script ==================
 $bootstrapADScriptPath = "$repoPath\code\bootstrap_ad.ps1"
-$taskExists = Get-ScheduledTask -TaskName "RunPostADScript" -ErrorAction SilentlyContinue
+$adTaskExists = Get-ScheduledTask -TaskName "RunPostADScript" -ErrorAction SilentlyContinue
 
-if (-not $taskExists) {
+if (-not $aTaskExists) {
     Write-Host "Creating scheduled task for AD bootstrap script..."
     $action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-ExecutionPolicy Bypass -File `"$bootstrapADScriptPath`" -Users 10 -Groups 3 -Admins 1"
     $trigger = New-ScheduledTaskTrigger -AtStartup
@@ -84,8 +84,16 @@ if (-not $taskExists) {
 }
 
 # ============ Set Static IP ==============================
-New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 10.0.1.100 -PrefixLength 24 -DefaultGateway 10.0.1.1
-Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 127.0.0.1
+if (-not (Get-NetIPAddress -IPAddress "10.0.1.100" -ErrorAction SilentlyContinue)) {
+    New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 10.0.1.100 -PrefixLength 24 -DefaultGateway 10.0.1.1
+    Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 127.0.0.1
+}
+
+# ================= Install AD-Domain-Services ===========================
+if (-not (Get-WindowsFeature AD-Domain-Services).Installed) {
+    Write-Host "Installing AD DS Feature..."
+    Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+}
 
 
 # ======== Promote to Domain Controller ========================    
