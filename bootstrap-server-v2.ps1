@@ -58,6 +58,16 @@ if (-not (StepCompleted $gitFlag)) {
     
 # }
 
+if (Test-Path $repoPath) {
+    Write-Host "DEBUG: AD repo path still exists!"
+    Get-ChildItem -Path $repoPath -Recurse | Select-Object FullName
+}
+
+if (Test-Path $repoPath) {
+    Write-Host "Cleaning up existing AD repo..."
+    Remove-Item -Path $repoPath -Recurse -Force
+}
+
 
 # ==== Clone AD repo =============
 $repoPath = "$cyberlabPath\AD"
