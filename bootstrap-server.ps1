@@ -1,83 +1,123 @@
 
+$ErrorActionPreference = "Stop"
 
-# Enable WinRM
+# ===== Enable Logging =======
+$logPath = "C:\cyberlab\bootstrap.log"
+Start-Transcript -Path $logPath -Append
+
+# ====== Helper: Flag Check ========
+function StepCompleted($flag) {
+    return (Test-Path $flag)
+}
+
+# === Path =====
+$tempPath = "C:\Temp"
+$cyberlabPath = "C:\cyberlab"
+$netFlag = "$cyberlabPath\net_installed.flag"
+$chocoFlag = "$cyberlabPath\choco_installed.flag"
+$gitFlag = "$cyberlabPath\git_installed.flag"
+$adFlag = "C:\domain.promoted"
+$rebootFlag = "$tempPath\after-reboot.flag"
+
+# ===== Ensure Required Folders ==========
+New-Item -ItemType Directory -Force -Path $tempPath, $cyberlabPath | Out-Null
+
+# ========== Enable WinRM ==========================
 Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value true
 Set-Item -Path "WSMan:\localhost\Service\Auth\Basic" -Value true
 Enable-PSRemoting -Force
 
-# Ensure Temp Direcytory exists
-if (-not (Test-Path "C:\Temp")) {
-    New-Item -Path "C:\Temp" -ItemType Directory -Force | Out-Null
+# ============== .NET 4.8 Install ======================
+
+if (-not (StepCompleted $netFlag)) {
+    try {
+        Write-Host "Installing .NET 4.8..."
+        $netInstaller = "$tempPath\ndp48.exe"
+        Invoke-WebRequest `
+            -Uri "https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/8494001c276a4b96804cde7829c04d7f/ndp48-x86-x64-allos-enu.exe" `
+            -OutFile $netInstaller
+        Start-Process $netInstaller -ArgumentList "/quiet /norestart" -Wait
+        
+        New-Item -ItemType File -Path $rebootFlag -Force
+        New-Item -ItemType File -Path $netFlag -Force
+        Write-Host "Rebooting to Complete .NET installation..."
+        Stop-Transcript
+        Restart-Computer -Force
+        exit
+    }
+    catch {
+        Write-Error ".NET install failed: $_"
+    }
+}
+
+if (StepCompleted $netFlag) {
+    Start-Transcript -Path $logPath -Append
+}
+
+# ============ Install Chocolatey =======================
+if (-not (StepCompleted $chocoFlag)) {
+    try {
+        Write-Host "Installing Chocolatey..."
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        Invoke-WebRequest "https://chocolatey.org/install.ps1" -UseBasicParsing | iex
+        New-Item -ItemType File -Path $chocoFlag -Force
+    }
+    catch {
+        Write-Error "Chocolatey install failed: $_"
+        exit 1
+    }
+}
+
+# ============= Install Git ============================
+if (-not (StepCompleted $gitFlag)) {
+    try {
+        choco install git -y
+        New-Item -ItemType File -Path $gitFlag -Force
+    }
+    catch {
+        Write-Error "it install failed: $_"
+    }
 }
 
 
-# Ensure the script directory exists
-if (-not (Test-Path "C:\cyberlab")) {
-    New-Item -Path "C:\cyberlab" -ItemType Directory -Force | Out-Null
-}
-
-Set-ExecutionPolicy Bypass -Scope Process -Force
-
-# Install .NET 4.8
-Invoke-WebRequest `
-  -Uri "https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/8494001c276a4b96804cde7829c04d7f/ndp48-x86-x64-allos-enu.exe" `
-  -OutFile "C:\Temp\ndp48.exe"
-Start-Process "C:\Temp\ndp48.exe" -ArgumentList "/quiet /norestart" -Wait
-
-# Mark reboot
-New-Item -ItemType File -Path "C:\Temp\pending-reboot.flag"
-
-Restart-Computer -Force
-
-Invoke-WebRequest "https://chocolatey.org/install.ps1" -UseBasicParsing | iex
-
-
-if (Test-Path "C:\Temp\pending-reboot.flag") {
-    choco install git -y
-
-    Remove-Item "C:\Temp\pending-reboot.flag"
-
-}
-
-# Ensure Git is installed
-if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-    Invoke-WebRequest -Uri "https://github.com/git-for-windows/git/releases/download/v2.42.0.windows.1/Git-2.42.0-64-bit.exe" `
-        -OutFile "C:Windows\Temp\git-installer.exe"
-    Start-Process "C:Windows\Temp\git-installer.exe" -ArgumentList "/VERYSILENT", "/NORESTART" -Wait
-}
-
-# Clone AD repo
-if (-not (Test-Path "C:\cyberlab")) {
+# ==== Clone AD repo =============
+if (-not (Test-Path "$cyberlabPath\AD")) {
     git clone "https://github.com/fozziiee/AD.git" "C:\cyberlab"
 }
 
-$domain = "xyz.local"
-$safeModePassword = ConvertTo-SecureString "P@ssw0rd123" -AsPlainText -Force
-$bootstrapScriptPath = "C:\cyberlab\AD\code\bootstrap_ad.ps1"
+# ============ Schedule AD Bootstrap Script ==================
+$bootstrapScriptPath = "$cyberlabPath\AD\code\bootstrap_ad.ps1"
+$taskExists = Get-ScheduledTask -TaskName "RunPostADScript" -ErrorAction SilentlyContinue
 
+if (-not $taskExists) {
+    Write-Host "Creating scheduled task for AD bootstrap script..."
+    $action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-ExecutionPolicy Bypass -File `"$bootstrapScriptPath`" -Users 10 -Groups 3 -Admins 1"
+    $trigger = New-ScheduledTaskTrigger -AtStartup
+    Register-ScheduledTask -TaskName "RunPostADScript" -Action $action -Trigger $trigger -RunLevel Highest -User "SYSTEM"
+}
 
-# Schedule it to run on startup with args
-$action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-ExecutionPolicy Bypass -File `"$bootstrapScriptPath`" -Users 10 -Groups 3 -Admins 1"
-$trigger = New-ScheduledTaskTrigger -AtStartup
-Register-ScheduledTask -TaskName "RunPostADScript" -Action $action -Trigger $trigger -RunLevel Highest -User "SYSTEM"
-
-# Set to static IP address
+# ============ Set Static IP ==============================
 New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 10.0.1.100 -PrefixLength 24 -DefaultGateway 10.0.1.1
 Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 127.0.0.1
 
-# Install AD DS if not already installed
-if (-not (Get-WindowsFeature AD-Domain-Services).Installed) {
-    Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+
+# ======== Promote to Domain Controller ========================    
+if (-not (StepCompleted $adFlag)) {
+    $domain = "xyz.local"
+    $safeModePassword = ConvertTo-SecureString "P@ssw0rd123" -AsPlainText -Force
+
+    try {
+        Write-Host "Promoting to Domain Controller for $domain..."
+        Install-ADDSForest -DomainName $domain -SafeModeAdministratorPassword $safeModePassword -Force:$true
+        New-Item -ItemType File -Path $adFlag -Force
+        Write-Host "Domain promotion complete"
+    }
+    catch {
+        Write-Error "Domain promotion failed: $_"
+        exit 1
+    }
+
 }
 
-# Promote to DC if not already promoted 
-if (-not (Test-Path "C:\domain.promoted")) {
-    Install-ADDSForest `
-        -DomainName $domain `
-        -SafeModeAdministratorPassword $safeModePassword `
-        -Force:$true
-
-    # Create flag file so it doesn't try to promote again after reboot
-    New-Item -Path "C:\domain.promoted" -ItemType File -Force
-}
-
+Write-Host "Bootstrap Complete"
+Stop-Transcript
