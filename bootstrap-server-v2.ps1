@@ -76,7 +76,7 @@ if (-not (Test-Path $repoPath)) {
 $bootstrapADScriptPath = "$repoPath\code\bootstrap_ad.ps1"
 $adTaskExists = Get-ScheduledTask -TaskName "RunPostADScript" -ErrorAction SilentlyContinue
 
-if (-not $aTaskExists) {
+if (-not $adTaskExists) {
     Write-Host "Creating scheduled task for AD bootstrap script..."
     $action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-ExecutionPolicy Bypass -File `"$bootstrapADScriptPath`" -Users 10 -Groups 3 -Admins 1"
     $trigger = New-ScheduledTaskTrigger -AtStartup
