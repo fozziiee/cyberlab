@@ -55,19 +55,20 @@ if (-not (Test-Path $restartedFlag)) {
     Write-Host "Git installed. Opening new terminal..."
     New-Item -ItemType File -Path $restartedFlag -Force
     Start-Process powershell.exe -ArgumentList "-ExecutionPolicy Bypass -File `"$bootstrapScriptPath`""
-    exit
+    
 }
 
 
 # ==== Clone AD repo =============
 $repoPath = "$cyberlabPath\AD"
+$gitPath = "C:\Program Files\Git\cmd\git.exe"
 if (-not (Test-Path $repoPath)) {
     try {
-        git clone "https://github.com/fozziiee/AD.git" $repoPath
+        & $gitPath clone "https://github.com/fozziiee/AD.git" $repoPath
     }
     catch {
         Start-Sleep -Seconds 5
-        git clone "https://github.com/fozziiee/AD.git" $repoPath
+        & $gitPath clone "https://github.com/fozziiee/AD.git" $repoPath
     }
 }
 
