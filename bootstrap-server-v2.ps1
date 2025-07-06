@@ -17,6 +17,8 @@ $bootstrapScriptPath = "C:\bootstrap.ps1"
 $gitFlag = "$cyberlabPath\git_installed.flag"
 $adFlag = "C:\domain.promoted"
 $rebootFlag = "$tempPath\after-reboot.flag"
+$restartedFlag = "$cyberlabPath\restarted_after_git.flag"
+
 
 # ===== Ensure Required Folders ==========
 New-Item -ItemType Directory -Force -Path $tempPath, $cyberlabPath | Out-Null
@@ -29,6 +31,7 @@ Enable-PSRemoting -Force
 
 
 # ============= Install Git ============================
+Write-Host "Downloading and Installing Git..."
 if (-not (StepCompleted $gitFlag)) {
     try {
         $gitInstaller = "C:\Temp\GitInstaller.exe"
@@ -38,28 +41,38 @@ if (-not (StepCompleted $gitFlag)) {
             -OutFile $gitInstaller
         
         Start-Process -FilePath $gitInstaller -ArgumentList "/VERYSILENT", "/NORESTART" -Wait
+        New-Item -ItemType File -Path $gitFlag -Force
     }
     catch {
         Write-Error "it install failed: $_"
+        exit 1
     }
 }
 
-$restartedFlag = "$cyberlabPath\restarted_after_git.flag"
+# ============ Restart Shell if FIrst Run After Git Install ===========
 
 if (-not (Test-Path $restartedFlag)) {
-    New-Item -ItemType File -Path "$cyberlabPath\restarted_after_git.flag" -Force
+    Write-Host "Git installed. Opening new terminal..."
+    New-Item -ItemType File -Path $restartedFlag -Force
     Start-Process powershell.exe -ArgumentList "-ExecutionPolicy Bypass -File `"$bootstrapScriptPath`""
     exit
 }
 
 
 # ==== Clone AD repo =============
-if (-not (Test-Path "$cyberlabPath\AD")) {
-    git clone "https://github.com/fozziiee/AD.git" "C:\cyberlab"
+$repoPath = "$cyberlabPath\AD"
+if (-not (Test-Path $repoPath)) {
+    try {
+        git clone "https://github.com/fozziiee/AD.git" $repoPath
+    }
+    catch {
+        Start-Sleep -Seconds 5
+        git clone "https://github.com/fozziiee/AD.git" $repoPath
+    }
 }
 
 # ============ Schedule AD Bootstrap Script ==================
-$bootstrapADScriptPath = "$cyberlabPath\AD\code\bootstrap_ad.ps1"
+$bootstrapADScriptPath = "$repoPath\code\bootstrap_ad.ps1"
 $taskExists = Get-ScheduledTask -TaskName "RunPostADScript" -ErrorAction SilentlyContinue
 
 if (-not $taskExists) {
@@ -94,7 +107,7 @@ if (-not (StepCompleted $adFlag)) {
 
 Write-Host "Bootstrap Complete"
 
-Unregister-ScheduledTask -TaskName "ResumeBootstrap" -Confirm:$false
+Remove-Item $restartedFlag -Force -ErrorAction SilentlyContinue
 Unregister-ScheduledTask -TaskName "RunPostADScript" -Confirm:$false
 
 Stop-Transcript
