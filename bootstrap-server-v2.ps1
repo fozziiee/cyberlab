@@ -57,6 +57,7 @@ if (-not (StepCompleted $gitFlag)) {
 #     Start-Process powershell.exe -ArgumentList "-ExecutionPolicy Bypass -File `"$bootstrapScriptPath`""
     
 # }
+$repoPath = "$cyberlabPath\AD"
 
 if (Test-Path $repoPath) {
     Write-Host "DEBUG: AD repo path still exists!"
@@ -70,7 +71,6 @@ if (Test-Path $repoPath) {
 
 
 # ==== Clone AD repo =============
-$repoPath = "$cyberlabPath\AD"
 $gitPath = "C:\Program Files\Git\cmd\git.exe"
 if (-not (Test-Path $repoPath)) {
     try {
