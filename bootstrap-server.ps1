@@ -13,6 +13,7 @@ function StepCompleted($flag) {
 # === Path =====
 $tempPath = "C:\Temp"
 $cyberlabPath = "C:\cyberlab"
+$bootstrapScriptPath = "C:\bootstrap.ps1"
 $netFlag = "$cyberlabPath\net_installed.flag"
 $chocoFlag = "$cyberlabPath\choco_installed.flag"
 $gitFlag = "$cyberlabPath\git_installed.flag"
@@ -21,6 +22,16 @@ $rebootFlag = "$tempPath\after-reboot.flag"
 
 # ===== Ensure Required Folders ==========
 New-Item -ItemType Directory -Force -Path $tempPath, $cyberlabPath | Out-Null
+
+# ======== Resume Script Task ===========================
+$taskExists = Get-ScheduledTask -TaskName "ResumeBootstrap" -ErrorAction SilentlyContinue
+
+if (-not $taskExists) {
+    Write-Host "Registering startup task to resume bootstrap script..."
+    $action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-ExecutionPolicy Bypass -File `"$bootstrapScriptPath`""
+    $trigger = New-ScheduledTaskTrigger -AtStartup
+    Register-ScheduledTask -TaskName "ResumeBootstrap" -Action $action -Trigger $trigger -RunLevel Highest -User "SYSTEM"
+}
 
 # ========== Enable WinRM ==========================
 Set-Item -Path "WSMan:\localhost\Service\AllowUnencrypted" -Value true
@@ -86,12 +97,12 @@ if (-not (Test-Path "$cyberlabPath\AD")) {
 }
 
 # ============ Schedule AD Bootstrap Script ==================
-$bootstrapScriptPath = "$cyberlabPath\AD\code\bootstrap_ad.ps1"
+$bootstrapADScriptPath = "$cyberlabPath\AD\code\bootstrap_ad.ps1"
 $taskExists = Get-ScheduledTask -TaskName "RunPostADScript" -ErrorAction SilentlyContinue
 
 if (-not $taskExists) {
     Write-Host "Creating scheduled task for AD bootstrap script..."
-    $action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-ExecutionPolicy Bypass -File `"$bootstrapScriptPath`" -Users 10 -Groups 3 -Admins 1"
+    $action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-ExecutionPolicy Bypass -File `"$bootstrapADScriptPath`" -Users 10 -Groups 3 -Admins 1"
     $trigger = New-ScheduledTaskTrigger -AtStartup
     Register-ScheduledTask -TaskName "RunPostADScript" -Action $action -Trigger $trigger -RunLevel Highest -User "SYSTEM"
 }
@@ -120,4 +131,8 @@ if (-not (StepCompleted $adFlag)) {
 }
 
 Write-Host "Bootstrap Complete"
+
+Unregister-ScheduledTask -TaskName "ResumeBootstrap" -Confirm:$false
+Unregister-ScheduledTask -TaskName "RunPostADScript" -Confirm:$false
+
 Stop-Transcript
