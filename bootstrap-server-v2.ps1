@@ -96,7 +96,18 @@ if (-not (Get-WindowsFeature AD-Domain-Services).Installed) {
 }
 
 
-# ======== Promote to Domain Controller ========================    
+# ======== Promote to Domain Controller ========================
+
+# Set DNS suffix 
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "Domain" -Value "xyz.local"
+
+# Verify Hostname resolution
+$hostname = $env:COMPUTERNAME
+if (-not (Test-Connection $hostname -Count 1 -Quiet)) {
+    Write-Error "Hostname $hostname is not resolving. Check network/DNS config."
+    exit 1
+}
+
 if (-not (StepCompleted $adFlag)) {
     $domain = "xyz.local"
     $safeModePassword = ConvertTo-SecureString "P@ssw0rd123" -AsPlainText -Force
@@ -106,9 +117,11 @@ if (-not (StepCompleted $adFlag)) {
         Install-ADDSForest -DomainName $domain -SafeModeAdministratorPassword $safeModePassword -Force:$true
         New-Item -ItemType File -Path $adFlag -Force
         Write-Host "Domain promotion complete"
+        Restart-Computer -Force
     }
     catch {
         Write-Error "Domain promotion failed: $_"
+        Get-Content "C:\Windows\Debug\DcPromo.log" -Tail 50
         exit 1
     }
 
