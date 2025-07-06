@@ -60,19 +60,20 @@ if (-not (StepCompleted $gitFlag)) {
 
 
 # ==== Clone AD repo =============
-$repoPath = "$cyberlabPath\AD"
+
 $gitPath = "C:\Program Files\Git\cmd\git.exe"
 if (-not (Test-Path $repoPath)) {
     try {
-        & $gitPath clone "https://github.com/fozziiee/AD.git" $repoPath
+        & $gitPath clone "https://github.com/fozziiee/AD.git" $cyberlabPath
     }
     catch {
         Start-Sleep -Seconds 5
-        & $gitPath clone "https://github.com/fozziiee/AD.git" $repoPath
+        & $gitPath clone "https://github.com/fozziiee/AD.git" $cyberlabPath
     }
 }
 
 # ============ Schedule AD Bootstrap Script ==================
+$repoPath = "$cyberlabPath\AD"
 $bootstrapADScriptPath = "$repoPath\code\bootstrap_ad.ps1"
 $adTaskExists = Get-ScheduledTask -TaskName "RunPostADScript" -ErrorAction SilentlyContinue
 
