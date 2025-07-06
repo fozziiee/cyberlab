@@ -64,11 +64,11 @@ $repoPath = "$cyberlabPath\AD"
 $gitPath = "C:\Program Files\Git\cmd\git.exe"
 if (-not (Test-Path $repoPath)) {
     try {
-        & $gitPath clone "https://github.com/fozziiee/AD.git" $cyberlabPath
+        & $gitPath clone "https://github.com/fozziiee/AD.git" "C:\cyberlab\"
     }
     catch {
         Start-Sleep -Seconds 5
-        & $gitPath clone "https://github.com/fozziiee/AD.git" $cyberlabPath
+        & $gitPath clone "https://github.com/fozziiee/AD.git" "C:\cyberlab\"
     }
 }
 
