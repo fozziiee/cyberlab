@@ -31,8 +31,8 @@ Enable-PSRemoting -Force
 
 
 # ============= Install Git ============================
-Write-Host "Downloading and Installing Git..."
 if (-not (StepCompleted $gitFlag)) {
+    Write-Host "Downloading and Installing Git..."
     try {
         $gitInstaller = "C:\Temp\GitInstaller.exe"
 
