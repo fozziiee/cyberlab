@@ -51,12 +51,12 @@ if (-not (StepCompleted $gitFlag)) {
 
 # ============ Restart Shell if FIrst Run After Git Install ===========
 
-if (-not (Test-Path $restartedFlag)) {
-    Write-Host "Git installed. Opening new terminal..."
-    New-Item -ItemType File -Path $restartedFlag -Force
-    Start-Process powershell.exe -ArgumentList "-ExecutionPolicy Bypass -File `"$bootstrapScriptPath`""
+# if (-not (Test-Path $restartedFlag)) {
+#     Write-Host "Git installed. Opening new terminal..."
+#     New-Item -ItemType File -Path $restartedFlag -Force
+#     Start-Process powershell.exe -ArgumentList "-ExecutionPolicy Bypass -File `"$bootstrapScriptPath`""
     
-}
+# }
 
 
 # ==== Clone AD repo =============
