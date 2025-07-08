@@ -34,6 +34,8 @@ module "windows_server" {
   subnet_id           = module.network.subnet_id
   admin_username      = var.admin_username
   admin_password      = var.admin_password
+
+  lab_creds_upload_url = local.lab_creds_blob_url
 }
 
 

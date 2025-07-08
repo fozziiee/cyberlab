@@ -19,3 +19,7 @@ variable "admin_username" {
 variable "admin_password" {
   type = string
 }
+
+variable "lab_creds_upload_url" {
+  type = string
+}
