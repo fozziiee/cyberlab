@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../AD"
+		},
+		{
+			"name": "cyberlab",
+			"path": "."
+		}
+	],
+	"settings": {
+		"powershell.cwd": "cyberlab"
+	}
+}
