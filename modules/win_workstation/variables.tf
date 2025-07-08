@@ -27,3 +27,5 @@ variable "lab_creds_url" {
 variable "domain_name" {
   type = string
 }
+
+
