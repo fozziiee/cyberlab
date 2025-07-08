@@ -19,3 +19,11 @@ variable "admin_username" {
 variable "admin_password" {
   type = string
 }
+
+variable "lab_creds_url" {
+  type = string
+}
+
+variable "domain_name" {
+  type = string
+}

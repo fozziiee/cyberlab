@@ -43,3 +43,12 @@ resource "azurerm_windows_virtual_machine" "this" {
     role        = "windows-workstation"
   }
 }
+
+data "template_file" "workstation_bootstrap" {
+  template = file("${path.root}/bootstrap_workstation.ps1")
+
+  vars = {
+    creds_url = var.lab_creds_url
+    domain = var.domain_name
+  }
+} 

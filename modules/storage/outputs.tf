@@ -19,3 +19,7 @@ output "upload_url_base" {
   sensitive = true
 }
 
+output "lab_secrets_container_name" {
+  value = azurerm_storage_container.lab-secrets.name
+}
+

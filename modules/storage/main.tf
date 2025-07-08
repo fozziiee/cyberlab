@@ -21,6 +21,12 @@ resource "azurerm_storage_container" "vpn" {
   container_access_type = "private"
 }
 
+resource "azurerm_storage_container" "lab-secrets" {
+  name = "lab-secrets"
+  storage_account_id = azurerm_storage_account.this.id
+  container_access_type = "private"
+}
+
 resource "time_static" "now" {}
 
 data "azurerm_storage_account_sas" "vpn_sas" {
