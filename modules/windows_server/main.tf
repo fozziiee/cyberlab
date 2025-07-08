@@ -76,7 +76,7 @@ resource "azurerm_virtual_machine_extension" "ad_domain_setup" {
 
   settings = jsonencode({
     fileUris         = ["https://raw.githubusercontent.com/fozziiee/cyberlab/master/bootstrap-server.ps1"]
-    commandToExecute = "powershell -ExecutionPolicy Unrestricted -File bootstrap-server.ps1"
+    commandToExecute = "powershell -ExecutionPolicy Unrestricted -File bootstrap-server-v2.ps1"
   })
 
 }
