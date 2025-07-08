@@ -128,7 +128,6 @@ if (-not (StepCompleted $adFlag)) {
         Install-ADDSForest -DomainName $domain -SafeModeAdministratorPassword $safeModePassword -Force:$true
         New-Item -ItemType File -Path $adFlag -Force
         Write-Host "Domain promotion complete"
-        Restart-Computer -Force
     }
     catch {
         Write-Error "Domain promotion failed: $_"
