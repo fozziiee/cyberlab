@@ -1,5 +1,7 @@
 #!/bin/bash
 
+enable_bastion=${1:-false}
+
 echo "🔽 Cloning repo..."
 git pull
 
