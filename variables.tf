@@ -8,3 +8,9 @@ variable "admin_password" {
   type        = string
   sensitive   = true
 }
+
+variable "enable_bastion" {
+  description = "Set true to deploy Bastion"
+  type        = bool
+  default     = false
+}
