@@ -6,3 +6,8 @@ locals {
 locals {
   lab_creds_blob_url = "https://${module.storage.storage_account_name}.blob.core.windows.net/${module.storage.lab_secrets_container_name}/lab-creds.json${module.storage.sas_token}"
 }
+
+locals {
+  vnet_name = "cyberlab-vnet"
+  vnet_rg_name = "cyberlab-rg"
+}

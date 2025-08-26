@@ -76,3 +76,13 @@ module "storage" {
   location            = local.location
   resource_group_name = local.resource_group_name
 }
+
+module "bastion" {
+  source = "./modules/bastion"
+  count = var.enable_bastion ? 1 : 0
+
+  resource_group_name = local.resource_group_name
+  location            = local.location
+  vnet_name = local.vnet_name
+  vnet_resource_group_name = local.vnet_rg_name
+}
