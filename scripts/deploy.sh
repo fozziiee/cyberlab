@@ -12,4 +12,4 @@ echo "🧠 Planning infrastructure..."
 terraform plan -var-file="terraform.tfvars"
 
 echo "⚙️ Applying infrastructure..."
-terraform apply -var-file="terraform.tfvars" -var="enable_bastion=true" -auto-approve
+terraform apply -var-file="terraform.tfvars" -var="enable_bastion=$enable_bastion" -auto-approve
