@@ -53,3 +53,8 @@ variable "scale_units" {
   type        = number
   default     = 2
 }
+
+variable "vnet_id" {
+  description = "ID of the existing VNet"
+  type        = string
+}
