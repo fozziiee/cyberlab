@@ -1,15 +1,15 @@
-data "azurerm_virtual_network" "vnet" {
-  name                = var.vnet_name
-  resource_group_name = var.resource_group_name
+# data "azurerm_virtual_network" "vnet" {
+#   name                = var.vnet_name
+#   resource_group_name = var.resource_group_name
   
-}
+# }
 
 # Create Bastion subnet
 resource "azurerm_subnet" "bastion" {
   name = var.subnet_name
   resource_group_name = var.vnet_resource_group_name
-  virtual_network_name = data.azurerm_virtual_network.vnet.name
   address_prefixes = var.subnet_address_prefixes
+  virtual_network_name = var.vnet_name
 }
 
 resource "azurerm_public_ip" "pip" {
