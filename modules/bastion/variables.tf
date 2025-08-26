@@ -33,7 +33,7 @@ variable "subnet_name" {
 variable "subnet_address_prefixes" {
   description = "CIDR(s) for AzureBastionSubnet (must be /27 or larger)"
   type        = list(string)
-  default     = ["10.0.0.0/16"]
+  default     = ["10.0.2.0/27"]
 }
 
 variable "public_ip_name" {
