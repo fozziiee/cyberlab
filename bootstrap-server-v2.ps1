@@ -83,16 +83,59 @@ if (-not (Test-Path $repoPath)) {
 }
 
 # ============ Schedule AD Bootstrap Script ==================
-$repoPath = "$cyberlabPath\AD"
-$bootstrapADScriptPath = "$repoPath\code\bootstrap_ad.ps1"
-$adTaskExists = Get-ScheduledTask -TaskName "RunPostADScript" -ErrorAction SilentlyContinue
+# $repoPath = "$cyberlabPath\AD"
+# $bootstrapADScriptPath = "$repoPath\code\bootstrap_ad.ps1"
+# $adTaskExists = Get-ScheduledTask -TaskName "RunPostADScript" -ErrorAction SilentlyContinue
 
-if (-not $adTaskExists) {
-    Write-Host "Creating scheduled task for AD bootstrap script..."
-    $action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-ExecutionPolicy Bypass -File `"$bootstrapADScriptPath`" -Users 10 -Groups 3 -Admins 1"
-    $trigger = New-ScheduledTaskTrigger -AtStartup
-    Register-ScheduledTask -TaskName "RunPostADScript" -Action $action -Trigger $trigger -RunLevel Highest -User "SYSTEM"
+# if (-not $adTaskExists) {
+#     Write-Host "Creating scheduled task for AD bootstrap script..."
+#     $action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-ExecutionPolicy Bypass -File `"$bootstrapADScriptPath`" -Users 10 -Groups 3 -Admins 1"
+#     $trigger = New-ScheduledTaskTrigger -AtStartup
+#     Register-ScheduledTask -TaskName "RunPostADScript" -Action $action -Trigger $trigger -RunLevel Highest -User "SYSTEM"
+# }
+
+# --- Config ---
+$repoPath              = "C:\cyberlab\AD"
+$bootstrapADScriptPath = Join-Path $repoPath "code\bootstrap_ad.ps1"
+$taskPath              = "\Cyberlab\"
+$taskName              = "RunPostADScript"
+$taskFullPath          = "$taskPath$taskName"
+$logsDir               = "C:\cyberlab\logs"
+$wrapperCmd            = "C:\cyberlab\RunPostADScript.cmd"
+
+# Ensure files/dirs exist
+New-Item -ItemType Directory -Force -Path $logsDir | Out-Null
+if (-not (Test-Path $bootstrapADScriptPath)) { throw "Missing: $bootstrapADScriptPath" }
+Unblock-File -Path $bootstrapADScriptPath -ErrorAction SilentlyContinue
+
+# Wrapper to force 64-bit PowerShell and capture output
+@"
+@echo off
+setlocal
+cd /d "$repoPath"
+%SystemRoot%\Sysnative\WindowsPowerShell\v1.0\powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$bootstrapADScriptPath" >> "$logsDir\RunPostADScript.log" 2>&1
+echo ExitCode=%ERRORLEVEL% >> "$logsDir\RunPostADScript.log"
+endlocal
+exit /b %ERRORLEVEL%
+"@ | Out-File -FilePath $wrapperCmd -Encoding ASCII -Force
+
+# Build task objects
+$action    = New-ScheduledTaskAction -Execute $wrapperCmd
+# Pick ONE trigger:
+$trigger   = New-ScheduledTaskTrigger -AtStartup             # <-- runs next reboot
+# $trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddMinutes(2))  # <-- runs in ~2 min (no reboot)
+$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+$settings  = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
+
+# Register idempotently under \Cyberlab\
+$existing = Get-ScheduledTask -TaskPath $taskPath -TaskName $taskName -ErrorAction SilentlyContinue
+if (-not $existing) {
+  Register-ScheduledTask -TaskPath $taskPath -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Description "Cyberlab AD post-promotion bootstrap" | Out-Null
 }
+
+# Prove it exists
+Get-ScheduledTask -TaskPath $taskPath -TaskName $taskName | Select TaskPath,TaskName,State | Format-List
+
 
 # ============ Set Static IP ==============================
 if (-not (Get-NetIPAddress -IPAddress "10.0.1.100" -ErrorAction SilentlyContinue)) {
