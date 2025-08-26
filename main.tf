@@ -85,4 +85,9 @@ module "bastion" {
   vnet_name = local.vnet_name
   vnet_resource_group_name = local.vnet_rg_name
   vnet_id = module.network.vnet_id
+
+  depends_on = [ 
+    azurerm_resource_group.cyberlab-rg,
+    module.network
+   ]
 }
