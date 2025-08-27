@@ -122,8 +122,8 @@ exit /b %ERRORLEVEL%
 # Build task objects
 $action    = New-ScheduledTaskAction -Execute $wrapperCmd
 # Pick ONE trigger:
-$trigger   = New-ScheduledTaskTrigger -AtStartup             # <-- runs next reboot
-# $trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddMinutes(2))  # <-- runs in ~2 min (no reboot)
+# $trigger   = New-ScheduledTaskTrigger -AtStartup             # <-- runs next reboot
+$trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddMinutes(2))  # <-- runs in ~2 min (no reboot)
 $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 $settings  = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
 
@@ -134,7 +134,8 @@ if (-not $existing) {
 }
 
 # Prove it exists
-Get-ScheduledTask -TaskPath $taskPath -TaskName $taskName | Select TaskPath,TaskName,State | Format-List
+$task = Get-ScheduledTask -TaskPath $taskPath -TaskName $taskName
+$task | Select TaskPath,TaskName,State | Format-List
 
 
 # ============ Set Static IP ==============================
@@ -180,9 +181,22 @@ if (-not (StepCompleted $adFlag)) {
 
 }
 
+# ========== Check if Scheduled Task Has Run ==========
+$hasRun = $false
+if ($task) {
+    $info = Get-ScheduledTaskInfo -TaskName $taskName -TaskPath $taskPath
+    if ($info.LastRunTime -ne $null -and $info.LastRunTime -gt [datetime]::MinValue) {
+        $hasRun = $true
+    }
+}
+
+# ========== Remove Task Only If It Has Run ==========
+if ($hasRun) {
+    Remove-Item $restartedFlag -Force -ErrorAction SilentlyContinue
+    Unregister-ScheduledTask -TaskName "RunPostADScript" -Confirm:$false
+}
+
 Write-Host "Bootstrap Complete"
 
-Remove-Item $restartedFlag -Force -ErrorAction SilentlyContinue
-Unregister-ScheduledTask -TaskName "RunPostADScript" -Confirm:$false
 
 Stop-Transcript
