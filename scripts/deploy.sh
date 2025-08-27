@@ -9,7 +9,7 @@ echo "🔧 Initializing Terraform..."
 terraform init
 
 echo "🧠 Planning infrastructure..."
-terraform plan -var-file="terraform.tfvars"
+terraform plan -var-file="terraform.tfvars" -var="enable_bastion=$enable_bastion"
 
 echo "⚙️ Applying infrastructure..."
 terraform apply -var-file="terraform.tfvars" -var="enable_bastion=$enable_bastion" -auto-approve
