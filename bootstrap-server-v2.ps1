@@ -82,6 +82,51 @@ if (-not (Test-Path $repoPath)) {
     }
 }
 
+
+
+# ============ Set Static IP ==============================
+if (-not (Get-NetIPAddress -IPAddress "10.0.1.100" -ErrorAction SilentlyContinue)) {
+    New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 10.0.1.100 -PrefixLength 24 -DefaultGateway 10.0.1.1
+    Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 127.0.0.1
+}
+
+# ================= Install AD-Domain-Services ===========================
+if (-not (Get-WindowsFeature AD-Domain-Services).Installed) {
+    Write-Host "Installing AD DS Feature..."
+    Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+}
+
+
+# ======== Promote to Domain Controller ========================
+
+# Set DNS suffix 
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "Domain" -Value "xyz.local"
+
+# Verify Hostname resolution
+$hostname = $env:COMPUTERNAME
+if (-not (Test-Connection $hostname -Count 1 -Quiet)) {
+    Write-Error "Hostname $hostname is not resolving. Check network/DNS config."
+    exit 1
+}
+
+if (-not (StepCompleted $adFlag)) {
+    $domain = "xyz.local"
+    $safeModePassword = ConvertTo-SecureString "P@ssw0rd123" -AsPlainText -Force
+
+    try {
+        Write-Host "Promoting to Domain Controller for $domain..."
+        Install-ADDSForest -DomainName $domain -SafeModeAdministratorPassword $safeModePassword -Force:$true
+        New-Item -ItemType File -Path $adFlag -Force
+        Write-Host "Domain promotion complete"
+    }
+    catch {
+        Write-Error "Domain promotion failed: $_"
+        Get-Content "C:\Windows\Debug\DcPromo.log" -Tail 50
+        exit 1
+    }
+
+}
+
 # ============ Schedule AD Bootstrap Script ==================
 # $repoPath = "$cyberlabPath\AD"
 # $bootstrapADScriptPath = "$repoPath\code\bootstrap_ad.ps1"
@@ -155,49 +200,6 @@ if (-not $existing) {
 $task = Get-ScheduledTask -TaskPath $taskPath -TaskName $taskName
 $task | Select TaskPath,TaskName,State | Format-List
 
-
-# ============ Set Static IP ==============================
-if (-not (Get-NetIPAddress -IPAddress "10.0.1.100" -ErrorAction SilentlyContinue)) {
-    New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 10.0.1.100 -PrefixLength 24 -DefaultGateway 10.0.1.1
-    Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 127.0.0.1
-}
-
-# ================= Install AD-Domain-Services ===========================
-if (-not (Get-WindowsFeature AD-Domain-Services).Installed) {
-    Write-Host "Installing AD DS Feature..."
-    Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
-}
-
-
-# ======== Promote to Domain Controller ========================
-
-# Set DNS suffix 
-Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "Domain" -Value "xyz.local"
-
-# Verify Hostname resolution
-$hostname = $env:COMPUTERNAME
-if (-not (Test-Connection $hostname -Count 1 -Quiet)) {
-    Write-Error "Hostname $hostname is not resolving. Check network/DNS config."
-    exit 1
-}
-
-if (-not (StepCompleted $adFlag)) {
-    $domain = "xyz.local"
-    $safeModePassword = ConvertTo-SecureString "P@ssw0rd123" -AsPlainText -Force
-
-    try {
-        Write-Host "Promoting to Domain Controller for $domain..."
-        Install-ADDSForest -DomainName $domain -SafeModeAdministratorPassword $safeModePassword -Force:$true
-        New-Item -ItemType File -Path $adFlag -Force
-        Write-Host "Domain promotion complete"
-    }
-    catch {
-        Write-Error "Domain promotion failed: $_"
-        Get-Content "C:\Windows\Debug\DcPromo.log" -Tail 50
-        exit 1
-    }
-
-}
 
 # ========== Check if Scheduled Task Has Run ==========
 $hasRun = $false
