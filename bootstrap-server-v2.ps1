@@ -210,13 +210,13 @@ if ($task) {
     }
 }
 
-# ========== Remove Task Only If It Has Run ==========
-if ($hasRun) {
-    Remove-Item $restartedFlag -Force -ErrorAction SilentlyContinue
-    Unregister-ScheduledTask -TaskName "RunPostADScript" -Confirm:$false
-}
+# # ========== Remove Task Only If It Has Run ==========
+# if ($hasRun) {
+#     Remove-Item $restartedFlag -Force -ErrorAction SilentlyContinue
+#     Unregister-ScheduledTask -TaskName "RunPostADScript" -Confirm:$false
+# }
 
-Write-Host "Bootstrap Complete"
+# Write-Host "Bootstrap Complete"
 
 
-Stop-Transcript
+# Stop-TranscriptGet-ScheduledTask -TaskPath '\Cyberlab\' -TaskName 'RunPostADScript' | Get-ScheduledTaskInfo | Format-List *
