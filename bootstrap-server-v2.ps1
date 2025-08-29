@@ -97,7 +97,7 @@ if (-not (Test-Path $repoPath)) {
 # --- Config ---
 $repoPath              = "C:\cyberlab\AD"
 $bootstrapADScriptPath = Join-Path $repoPath "code\bootstrap_ad.ps1"
-$taskPath              = "\Cyberlab\"
+$taskPath              = "\Cyberlab\"Get-Content -Path C:\cyberlab\logs\RunPostADScript.log -Tail 200
 $taskName              = "RunPostADScript"
 $taskFullPath          = "$taskPath$taskName"
 $logsDir               = "C:\cyberlab\logs"
@@ -112,8 +112,26 @@ Unblock-File -Path $bootstrapADScriptPath -ErrorAction SilentlyContinue
 @"
 @echo off
 setlocal
+if not exist "$repoPath" (
+  echo Repo path missing: $repoPath >> "$logsDir\RunPostADScript.log"
+  exit /b 3
+)
 cd /d "$repoPath"
-%SystemRoot%\Sysnative\WindowsPowerShell\v1.0\powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$bootstrapADScriptPath" >> "$logsDir\RunPostADScript.log" 2>&1
+
+set "PS_SYSPATH=%SystemRoot%\Sysnative\WindowsPowerShell\v1.0\powershell.exe"
+set "PS_SYSTEM32=%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe"
+if exist "%PS_SYSPATH%" (
+  set "PS_EXE=%PS_SYSPATH%"
+) else (
+  set "PS_EXE=%PS_SYSTEM32%"
+)
+
+if not exist "%PS_EXE%" (
+  echo PowerShell not found at %PS_EXE% >> "$logsDir\RunPostADScript.log"
+  exit /b 3
+)
+
+"%PS_EXE%" -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$bootstrapADScriptPath" >> "$logsDir\RunPostADScript.log" 2>&1
 echo ExitCode=%ERRORLEVEL% >> "$logsDir\RunPostADScript.log"
 endlocal
 exit /b %ERRORLEVEL%
