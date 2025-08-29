@@ -97,7 +97,7 @@ if (-not (Test-Path $repoPath)) {
 # --- Config ---
 $repoPath              = "C:\cyberlab\AD"
 $bootstrapADScriptPath = Join-Path $repoPath "code\bootstrap_ad.ps1"
-$taskPath              = "\Cyberlab\"Get-Content -Path C:\cyberlab\logs\RunPostADScript.log -Tail 200
+$taskPath              = "\Cyberlab\"
 $taskName              = "RunPostADScript"
 $taskFullPath          = "$taskPath$taskName"
 $logsDir               = "C:\cyberlab\logs"
