@@ -200,6 +200,8 @@ if (-not $existing) {
 $task = Get-ScheduledTask -TaskPath $taskPath -TaskName $taskName
 $task | Select TaskPath,TaskName,State | Format-List
 
+# adding buffer for task to run
+Start-Sleep -Seconds 180
 
 # ========== Check if Scheduled Task Has Run ==========
 $hasRun = $false
